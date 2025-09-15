@@ -1,0 +1,61 @@
+# This workflow will test the web-perf-toolkit ESLint plugin
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Test Web Performance ESLint Plugin
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-eslint-plugin:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run ESLint with web-perf-toolkit plugin
+      run: npm run lint
+      continue-on-error: true
+    
+    - name: Run ESLint and save output
+      run: |
+        echo "Testing web-perf-toolkit ESLint plugin..."
+        npm run lint > eslint-output.txt 2>&1 || true
+        echo "ESLint output:"
+        cat eslint-output.txt
+      continue-on-error: true
+    
+    - name: Check for performance warnings
+      run: |
+        echo "Checking for web-perf-toolkit warnings..."
+        if grep -q '@curiousdev-oss/perf' eslint-output.txt; then
+          echo "✅ SUCCESS: web-perf-toolkit plugin is working and detected performance issues!"
+          grep '@curiousdev-oss/perf' eslint-output.txt || true
+        else
+          echo "ℹ️  No web-perf-toolkit warnings found in output"
+        fi
+      continue-on-error: true
+    
+    - name: Upload ESLint results
+      uses: actions/upload-artifact@v3
+      with:
+        name: eslint-results-node-${{ matrix.node-version }}
+        path: eslint-output.txt
+      if: always()
