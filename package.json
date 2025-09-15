@@ -9,7 +9,8 @@
     "serve:all": "concurrently \"npm run serve:api\" \"npm run serve:web\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "eslint src/**/*.{ts,js} --ext .ts,.js"
   },
   "private": true,
   "dependencies": {
@@ -35,6 +36,10 @@
     "@angular/compiler-cli": "~13.0.0",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
+    "@curiousdev-oss/eslint-plugin-web-perf": "^0.1.4",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
     "jasmine-core": "~3.10.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
